@@ -6,15 +6,10 @@ This API makes it easy to use Playwright to scrape data from websites without ha
 
 ## Contents:
 1. [Usage](#usage)
-2. [Scrape instructions:](#scrape-instructions)
-   1. [get_elem](#getelem)
-   2. [elem_exists](#elemexists)
-   3. [page_title](#pagetitle)
-   4. [get_text](#gettext)
-   5. [get_price](#getprice)
-   6. [get_regex](#getregex)
+2. [Scrape instructions](#scrape-instructions)
 3. [Setup:](#local-running)
-   1. [Local running](#local-running)
+   1. [Docker](#docker)
+   2. [Local running](#local-running)
 
 ## Usage:
 This example shows how to scrape product data from an online retailer using the API. Collecting basic information about the product including its current price and sale status:
@@ -127,6 +122,12 @@ Collects the first regex match from an elements text, takes the regex pattern as
 
 
 ## Setup:
+### Docker:
+For easier setup & management, this project can be run from a container
+````
+docker run -p 3000:3000 ghcr.io/benrf/scrape-api:master
+````
+
 ### Local running:
 To run the server locally from the repository code, do note that by running the api the machine will hold open the browsers used for scraping. This will impact the machines memory and network usage depending on the number of incoming requests
 1. Pull the git repo
