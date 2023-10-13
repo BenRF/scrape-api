@@ -2,7 +2,7 @@ const fs = require('fs');
 const gitRootDir = require('git-root-dir');
 
 (async () => {
-  const root = await gitRootDir('.');
+  const root = process.env.ROOT || await gitRootDir('.');
   const files = fs.readdirSync(`${root}/functions/scrapeFunctions`);
 
   let output = '';
