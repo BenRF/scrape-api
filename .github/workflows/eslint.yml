@@ -10,11 +10,11 @@ on:
 jobs:
   eslint:
     timeout-minutes: 2
-    name: runner / eslint
+    name: eslint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install modules
-        run: npm i
+        run: npm ci
       - name: Run ESLint
         run: eslint . --ext .js
