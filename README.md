@@ -76,6 +76,22 @@ This step takes a css selector and collects the first occurrence on the page tha
 { "first_link": "<a href="https://www.shop.com/product/12345" class="product-link">View this product</a>" }
 ````
 
+### get_elems:
+Collects all elements matching the selector, any step that occurs after will then be looped through
+````
+{
+   "steps": {
+        "prices": [
+            { "step": "get_elems", "args": "span.price" },
+            { "step": "get_price" }
+        ]
+    }
+}
+````
+````
+{ "prices": [ 329, 484, 174.9, 134.9, 40.99, 35.99, 144.9, 89.9, 69.9 ] }
+````
+
 ### elem_exists:
 A simple boolean instruction that allows the user to check if a selector is present on a page. Will return `true` if the element is found, otherwise will be `false`
 
