@@ -28,6 +28,7 @@ module.exports = class ScrapeEndpoint extends Endpoint {
   async run(req, res) {
     const { body } = req;
     if (this.validBody(body)) {
+      console.log(`Scraping ${body.url} for ${req.ip}`);
       const page = await this.newPage();
       try {
         await this.gotoUrl(page, body);
