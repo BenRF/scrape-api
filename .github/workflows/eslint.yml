@@ -13,25 +13,8 @@ jobs:
     name: runner / eslint
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - uses: actions/checkout@v3
-
-      - name: Fetching actions repo
-        uses: actions/checkout@v3
-        with:
-          repository: wtc-cdm/wtc-github-actions
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          path: ./.github/actions
-
-      - name: npm ci
-        continue-on-error: true
-        run: npm ci
-
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: npm i
       - name: Run ESLint
-        uses: ./.github/actions/action-eslint-master
-        with:
-          reporter: github-check
+        run: eslint . --ext .js
