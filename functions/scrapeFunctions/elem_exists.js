@@ -1,4 +1,3 @@
-const ScrapeFunction = require('./function');
 const Get_elem = require('./get_elem');
 
 module.exports = class elem_exists extends Get_elem {

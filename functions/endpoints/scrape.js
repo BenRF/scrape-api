@@ -48,7 +48,6 @@ module.exports = class ScrapeEndpoint extends Endpoint {
             result[field] = { error: e.message };
           }
         }
-
         this.jsonRespond(res, result);
       } catch (e) {
         this.errorRespond(res, 500, { name: e.name, message: e.message });
