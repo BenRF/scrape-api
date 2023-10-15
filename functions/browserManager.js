@@ -1,4 +1,5 @@
 const playwright = require('playwright');
+const logger = require('./logger').child({ file: 'BrowserManager' });
 
 module.exports = class BrowserManager {
   constructor() {
@@ -19,7 +20,7 @@ module.exports = class BrowserManager {
 
   async createBrowser(name, options) {
     if (this.browserNames.includes(name)) {
-      console.log(`Started ${name} browser instance`);
+      logger.info(`Started ${name} browser instance`);
       return playwright[name].launch(options);
     }
     return null;

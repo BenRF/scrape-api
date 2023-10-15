@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const logger = require('./logger').child({ file: 'Api' });
 
 const StatusEndpoint = require('./endpoints/status');
 const ScrapeEndpoint = require('./endpoints/scrape');
@@ -20,7 +21,7 @@ app.use(bodyParser.json());
 app.use('/api', router.getRouter());
 
 app.listen(3000, () => {
-  console.log(`Server Started at ${3000}`);
+  logger.info(`Server Started at ${3000}`);
 });
 
 process.on('exit', () => {

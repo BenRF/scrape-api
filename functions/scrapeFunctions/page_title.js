@@ -1,8 +1,8 @@
 const ScrapeFunction = require('./function');
 
 module.exports = class page_title extends ScrapeFunction {
-  constructor(args) {
-    super('page_title', args);
+  constructor(args, logger) {
+    super('page_title', args, logger);
     this.selector = args;
   }
 
@@ -11,6 +11,7 @@ module.exports = class page_title extends ScrapeFunction {
   }
 
   async runNext(result, next) {
+    this.log(`Found "${result}"`);
     next.shift();
     return (next.length > 0) ? next[0].runFromText(result, next) : result.toString().trim();
   }
