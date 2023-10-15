@@ -1,4 +1,5 @@
 const Endpoint = require('./endpoint');
+// eslint-disable-next-line import/extensions
 const ScrapeFunctions = require('../scrapeFunctions');
 
 module.exports = class ScrapeEndpoint extends Endpoint {
