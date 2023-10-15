@@ -1,36 +1,34 @@
-const playwright = require('playwright');
-
 const Endpoint = require('./endpoint');
 // eslint-disable-next-line import/extensions
 const ScrapeFunctions = require('../scrapeFunctions');
 
 module.exports = class ScrapeEndpoint extends Endpoint {
-  constructor() {
+  constructor(browserManager) {
     super();
     this.requiredFields = ['url'];
+    this.browserManager = browserManager;
   }
 
-  async getBrowser() {
-    if (this.browser === undefined) {
-      this.browser = await playwright.chromium.launch();
+  async getBrowser(id) {
+    const browser = await this.browserManager.getBrowser(id);
+    if (browser) {
+      return browser;
     }
-    return this.browser;
+    throw new Error('Browser not found');
   }
 
-  async stop() {
-    await (await this.getBrowser()).close();
-  }
-
-  async newPage() {
-    return (await this.getBrowser()).newPage();
+  async newPage(id) {
+    return (await this.getBrowser(id)).newPage();
   }
 
   async run(req, res) {
     const { body } = req;
     if (this.validBody(body)) {
-      console.log(`Scraping ${body.url} for ${req.ip}`);
-      const page = await this.newPage();
+      let page;
       try {
+        console.log(`Scraping ${body.url} for ${req.ip}`);
+        const browserId = body.browser || 'chromium';
+        page = await this.newPage(browserId);
         await this.gotoUrl(page, body);
 
         const result = {};
@@ -54,7 +52,9 @@ module.exports = class ScrapeEndpoint extends Endpoint {
         this.errorRespond(res, 500, { name: e.name, message: e.message });
       }
 
-      await page.close();
+      if (page) {
+        await page.close();
+      }
     } else {
       this.errorRespond(res, 400, {
         error: 'Missing fields',
