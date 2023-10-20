@@ -1,60 +1,72 @@
-const playwright = require('playwright');
-
 const Endpoint = require('./endpoint');
 // eslint-disable-next-line import/extensions
 const ScrapeFunctions = require('../scrapeFunctions');
+const logger = require('../logger').child({ file: 'ScrapeEndpoint' });
 
 module.exports = class ScrapeEndpoint extends Endpoint {
-  constructor() {
+  constructor(browserManager) {
     super();
     this.requiredFields = ['url'];
+    this.browserManager = browserManager;
   }
 
-  async getBrowser() {
-    if (this.browser === undefined) {
-      this.browser = await playwright.chromium.launch();
+  async getBrowser(id) {
+    const browser = await this.browserManager.getBrowser(id);
+    if (browser) {
+      return browser;
     }
-    return this.browser;
+    throw new Error('Browser not found');
   }
 
-  async stop() {
-    await (await this.getBrowser()).close();
-  }
-
-  async newPage() {
-    return (await this.getBrowser()).newPage();
+  async newPage(id) {
+    return (await this.getBrowser(id)).newPage();
   }
 
   async run(req, res) {
     const { body } = req;
+    const requestLog = logger.child({ request: this.createRequestId(req) });
     if (this.validBody(body)) {
-      console.log(`Scraping ${body.url} for ${req.ip}`);
-      const page = await this.newPage();
+      let page;
       try {
+        requestLog.info(`Scraping ${body.url}`);
+        const browserId = body.browser || 'chromium';
+        page = await this.newPage(browserId);
         await this.gotoUrl(page, body);
+        requestLog.debug('Page loaded');
 
         const result = {};
         for (const [field, instructions] of Object.entries(body.steps)) {
+          const fieldLog = requestLog.child({ scrapeField: field });
+          fieldLog.debug('Starting');
           try {
             const steps = [];
             for (const { step, args } of instructions) {
               if (ScrapeFunctions[step]) {
-                steps.push(new ScrapeFunctions[step](args));
+                steps.push(new ScrapeFunctions[step](args, fieldLog));
               } else {
-                throw new Error(`${step} is not a valid function`);
+                const message = `${step} is not a valid function`;
+                fieldLog.error(message);
+                throw new Error(message);
               }
             }
             result[field] = await steps[0].runFirst(page, steps);
+            fieldLog.debug('Done');
           } catch (e) {
+            fieldLog.error(e.message);
             result[field] = { error: e.message };
           }
         }
         this.jsonRespond(res, result);
       } catch (e) {
+        requestLog.error(e.message);
         this.errorRespond(res, 500, { name: e.name, message: e.message });
       }
 
-      await page.close();
+      if (page) {
+        requestLog.debug('Page closed');
+        await page.close();
+      }
+      requestLog.info('Completed');
     } else {
       this.errorRespond(res, 400, {
         error: 'Missing fields',

@@ -1,5 +1,6 @@
-const fs = require('fs');
 const gitRootDir = require('git-root-dir');
+const fs = require('fs');
+const logger = require('./logger').child({ file: 'CreateIndex' });
 
 (async () => {
   const root = process.env.ROOT || await gitRootDir('.');
@@ -16,5 +17,5 @@ const gitRootDir = require('git-root-dir');
     }
   }
   fs.writeFileSync(`${root}/functions/scrapeFunctions/index.js`, output);
-  console.log(`Created index file for ${count} functions`);
+  logger.info(`Created index file for ${count} functions`);
 })();

@@ -1,6 +1,13 @@
+const crypto = require('crypto');
+
 module.exports = class Endpoint {
   constructor() {
     this.requiredFields = [];
+  }
+
+  createRequestId(req) {
+    const hash = crypto.createHash('md5').update(`${req.ip}:${new Date().toLocaleString()}`).digest('hex');
+    return hash.substring(0, 8);
   }
 
   // eslint-disable-next-line no-unused-vars
