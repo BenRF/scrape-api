@@ -1,5 +1,10 @@
 const Get_elem = require('./get_elem');
 
+/* elem_exists:
+- Must be passed an argument of a css selector
+
+This function will search for any element matching the selector and return true if it can be found on the page
+*/
 module.exports = class elem_exists extends Get_elem {
   constructor(args, logger) {
     super(args, logger);

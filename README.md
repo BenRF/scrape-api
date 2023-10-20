@@ -55,71 +55,15 @@ The API allows users to layer instructions, so they have better control over wha
 }
 ````
 
-### get_elem:
-This step takes a css selector and collects the first occurrence on the page that matches, these can be chained together for extracting sub-elements and will return the innerHtml if the final step. If the element isn't found on the page an error will be returned.
-````
-{
-    "steps": {
-        "first_link": [
-            { "step": "get_elem", "args": "div.product" },
-            { "step": "get_elem", "args": "a[href]" }
-        ]
-    }
-}
-````
-````
-{ "first_link": "<a href="https://www.shop.com/product/12345" class="product-link">View this product</a>" }
-````
-
-### get_elems:
-Collects all elements matching the selector, any step that occurs after will then be looped through
-````
-{
-   "steps": {
-        "prices": [
-            { "step": "get_elems", "args": "span.price" },
-            { "step": "get_price" }
-        ]
-    }
-}
-````
-````
-{ "prices": [ 329, 484, 174.9, 134.9, 40.99, 35.99, 144.9, 89.9, 69.9 ] }
-````
-
-### elem_exists:
-A simple boolean instruction that allows the user to check if a selector is present on a page. Will return `true` if the element is found, otherwise will be `false`
-
-### page_title:
-Collects the page name from the site, otherwise this can be collected from the `<title></title>` element
-
-### get_text:
-Extract the innerText from an element, by default takes no argument. Can be run as the first step if a selector is passed and will extract the text
-````
-{
-    "steps": {
-        "name": [
-            { "step": "get_elem", "args": "h1.product-title" },
-            { "step": "get_text" }
-        ]
-    }
-}
-````
-Is the same as:
-````
-{
-    "steps": {
-        "name": [ { "step": "get_text", "args": "h1.product-title" } ],
-    }
-}
-````
-
-### get_price:
-Pulls the first match of `/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g` from text, similar to `get_text` it takes no argument by default and can be used in short_hand to collect an element
-
-### get_regex:
-Collects the first regex match from an elements text, takes the regex pattern as an argument
-
+### Available steps:
+* [elem_exists](functions/scrapeFunctions/elem_exists.js): Check if an element can be found on a page
+* [get_elem](functions/scrapeFunctions/get_elem.js): Finds the first occurrence of a matching element
+* [get_elems](functions/scrapeFunctions/get_elems.js): Finds all occurrences of matching elements
+* [get_price](functions/scrapeFunctions/get_price.js): Extracts a price from elements text
+* [get_regex](functions/scrapeFunctions/get_regex.js): Runs a regex pattern on an element and returns the first match
+* [get_text](functions/scrapeFunctions/get_text.js): Collects text inside an element
+* [page_title](functions/scrapeFunctions/page_title.js): Returns the page title
+* [xpath](functions/scrapeFunctions/xpath.js): Runs an xpath
 
 ## Setup:
 ### Docker:

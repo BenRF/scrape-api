@@ -1,6 +1,11 @@
 const ScrapeFunction = require('./function');
 const Get_elem = require('./get_elem');
 
+/* get_text:
+
+When given a page element, extracts the innerText and returns it
+- Can be run as a first step if passed a selector, will run get_elem with the input and extract the text from that
+*/
 module.exports = class Get_text extends ScrapeFunction {
   constructor(args, logger) {
     super('get_text', args, logger);

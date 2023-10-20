@@ -1,6 +1,13 @@
 const ScrapeFunction = require('./function');
 const Get_text = require('./get_text');
 
+/* get_regex:
+- Must be passed a regex pattern to match against
+
+Will search an elements text for the first match against the pattern
+- This cannot be run as a first step, it must be passed an element or text
+- If run after a get_elem(s), will automatically run get_text first before regex matching
+*/
 module.exports = class get_regex extends ScrapeFunction {
   constructor(args, logger) {
     super('get_regex', args, logger);
