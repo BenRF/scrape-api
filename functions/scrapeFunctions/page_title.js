@@ -1,5 +1,8 @@
 const ScrapeFunction = require('./function');
 
+/* page_title:
+- Collects the title of the page tab
+*/
 module.exports = class page_title extends ScrapeFunction {
   constructor(args, logger) {
     super('page_title', args, logger);

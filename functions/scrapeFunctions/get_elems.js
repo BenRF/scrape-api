@@ -1,5 +1,13 @@
 const ScrapeFunction = require('./function');
 
+/* get_elems:
+- Must be passed an argument of a css selector
+
+Will find and return all occurrences of a selector
+- Any steps after this will be run against all found occurrences of the element
+- If this is the final step, all the elements innerHtml will be returned instead
+- If no versions of the element can be found on the page, an error is returned instead
+*/
 module.exports = class get_elems extends ScrapeFunction {
   constructor(args, logger) {
     super('get_elems', args, logger);

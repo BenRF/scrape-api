@@ -2,6 +2,12 @@ const ScrapeFunction = require('./function');
 const Get_regex = require('./get_regex');
 const Get_text = require('./get_text');
 
+/* get_price:
+
+This function will run a regex match to look for any prices inside an elements text
+- Can be run as the first step if provided with the css selector of which element to extract a price from
+- If no prices can be found in the text, "No Regex matches found" will be returned
+*/
 module.exports = class get_price extends ScrapeFunction {
   constructor(args, logger) {
     super('get_price', args, logger);
