@@ -1,13 +1,15 @@
 const ScrapeFunction = require('./function');
 
 module.exports = class Get_elem extends ScrapeFunction {
-  constructor(args) {
-    super('get_elem', args);
+  constructor(args, logger) {
+    super('get_elem', args, logger);
     this.selector = args;
   }
 
   async getElem(handle) {
-    return handle.$(this.selector);
+    const elem = await handle.$(this.selector);
+    this.log(`Found: ${(elem !== null) ? `<${await elem.evaluate((e) => e.tagName.toLowerCase())}> element` : null}`);
+    return elem;
   }
 
   async runFirst(page, next) {
@@ -23,7 +25,8 @@ module.exports = class Get_elem extends ScrapeFunction {
   }
 
   async runNext(result, next) {
+    const elem = (await result.innerHTML()).toString().trim();
     next.shift();
-    return (next.length > 0) ? next[0].runFromElement(result, next) : (await result.innerHTML()).toString().trim();
+    return (next.length > 0) ? next[0].runFromElement(result, next) : elem;
   }
 };
