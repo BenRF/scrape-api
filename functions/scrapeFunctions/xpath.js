@@ -11,7 +11,22 @@ module.exports = class xpath extends ScrapeFunction {
   }
 
   async runFirst(page, next) {
-    return this.runNext(page.locator(this.args), next);
+    this.log(`Running xpath: ${this.args}`);
+    return this.runNext(await page.evaluate((path) => {
+      const results = document.evaluate(path, document);
+      const allData = [];
+      let data = results.iterateNext();
+      if (data) {
+        allData.push(data.data);
+        while (data) {
+          data = results.iterateNext();
+          if (data) {
+            allData.push(data.data);
+          }
+        }
+      }
+      return (allData.length !== 1) ? allData : allData[0];
+    }, this.args), next);
   }
 
   async runNext(result, next) {
