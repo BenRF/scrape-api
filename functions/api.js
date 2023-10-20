@@ -1,5 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+
+process.env.DEBUG = process.argv.includes('-debug') ? '1' : '0';
+
 const logger = require('./logger').child({ file: 'Api' });
 
 const StatusEndpoint = require('./endpoints/status');

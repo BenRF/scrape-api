@@ -15,7 +15,7 @@ module.exports = class ScrapeFunction {
   }
 
   log(message) {
-    this.logger.info(message);
+    this.logger.debug(message);
   }
 
   throwError(message) {

@@ -32,7 +32,7 @@ module.exports = class ScrapeEndpoint extends Endpoint {
         const browserId = body.browser || 'chromium';
         page = await this.newPage(browserId);
         await this.gotoUrl(page, body);
-        requestLog.info('Page loaded');
+        requestLog.debug('Page loaded');
 
         const result = {};
         for (const [field, instructions] of Object.entries(body.steps)) {
@@ -56,7 +56,6 @@ module.exports = class ScrapeEndpoint extends Endpoint {
             result[field] = { error: e.message };
           }
         }
-        requestLog.info('Completed');
         this.jsonRespond(res, result);
       } catch (e) {
         requestLog.error(e.message);
@@ -64,9 +63,10 @@ module.exports = class ScrapeEndpoint extends Endpoint {
       }
 
       if (page) {
-        requestLog.info('Page closed');
+        requestLog.debug('Page closed');
         await page.close();
       }
+      requestLog.info('Completed');
     } else {
       this.errorRespond(res, 400, {
         error: 'Missing fields',

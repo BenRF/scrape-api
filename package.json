@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-index": "node functions/createIndex.js",
     "run-server": "npm run build-index && node functions/api.js",
+    "run-server-debug": "npm run build-index && node functions/api.js -debug",
     "build-image": "docker build -t benrf/scrape-api .",
     "run-image": "docker run -p 3000:3000 benrf/scrape-api"
   },
