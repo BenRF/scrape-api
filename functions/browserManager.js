@@ -6,8 +6,27 @@ module.exports = class BrowserManager {
     this.browserNames = ['chromium', 'firefox', 'webkit'];
     this.browsers = {};
     for (const name of this.browserNames) {
-      this.browsers[name] = null;
+      this.browsers[name] = {
+        browser: null,
+        type: name,
+        used: 0,
+        last_used: null,
+      };
     }
+  }
+
+  list() {
+    const output = [];
+    for (const [id, obj] of Object.entries(this.browsers)) {
+      output.push({
+        id,
+        status: (obj.browser !== null) ? 'open' : 'closed',
+        type: obj.type,
+        used: obj.used,
+        last_used: obj.last_used,
+      });
+    }
+    return output;
   }
 
   async stop() {
@@ -27,19 +46,20 @@ module.exports = class BrowserManager {
   }
 
   updateBrowserUsed(id) {
+    this.browsers[id] = {
+      ...this.browsers[id],
+      last_used: new Date(),
+      used: this.browsers[id].used += 1,
+    };
     this.browsers[id].last_used = new Date();
   }
 
   async getBrowser(id) {
     if (this.browserNames.includes(id)) {
-      if (this.browsers[id] === null) {
-        this.browsers[id] = {
-          browser: await this.createBrowser(id),
-          last_used: new Date(),
-        };
-      } else {
-        this.updateBrowserUsed(id);
+      if (this.browsers[id].browser === null) {
+        this.browsers[id].browser = await this.createBrowser(id);
       }
+      this.updateBrowserUsed(id);
       return this.browsers[id].browser;
     }
     if (this.browsers[id]) {

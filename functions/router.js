@@ -9,15 +9,15 @@ module.exports = class Router {
     return this.router;
   }
 
-  createGet(path, endpoint) {
-    this.router.get(path, this.createRun(endpoint));
+  createGet(path, endpoint, func) {
+    this.router.get(path, this.createRun(endpoint, func));
   }
 
-  createPost(path, endpoint) {
-    this.router.post(path, this.createRun(endpoint));
+  createPost(path, endpoint, func) {
+    this.router.post(path, this.createRun(endpoint, func));
   }
 
-  createRun(endpoint) {
-    return endpoint.run.bind(endpoint);
+  createRun(endpoint, func = 'run') {
+    return endpoint[func].bind(endpoint);
   }
 };
