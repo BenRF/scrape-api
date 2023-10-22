@@ -5,7 +5,7 @@ const logger = require('../logger').child({ file: 'ScrapeEndpoint' });
 
 module.exports = class ScrapeEndpoint extends Endpoint {
   constructor(browserManager) {
-    super();
+    super('scrape', undefined, ['run']);
     this.requiredFields = ['url'];
     this.browserManager = browserManager;
   }

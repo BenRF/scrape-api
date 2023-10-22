@@ -14,13 +14,8 @@ const Router = require('./router');
 const router = new Router();
 const browserManager = new BrowserManager();
 
-router.createGet('/status', new StatusEndpoint());
-const Scraper = new ScrapeEndpoint(browserManager);
-router.createPost('/scrape', Scraper);
-
-const browserEndpoint = new BrowserEndpoint(browserManager);
-for (const endpoint of ['list']) {
-  router.createGet(`/browser/${endpoint}`, browserEndpoint, endpoint);
+for (const endpoint of [new StatusEndpoint(), new ScrapeEndpoint(browserManager), new BrowserEndpoint(browserManager)]) {
+  router.createEndpoints(endpoint);
 }
 
 const app = express();
@@ -34,5 +29,5 @@ app.listen(3000, () => {
 });
 
 process.on('exit', () => {
-  browserManager.stop();
+  browserManager.stopAll();
 });

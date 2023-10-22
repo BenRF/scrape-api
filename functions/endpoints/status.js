@@ -2,7 +2,7 @@ const Endpoint = require('./endpoint');
 
 module.exports = class StatusEndpoint extends Endpoint {
   constructor() {
-    super();
+    super('status', ['run']);
     this.start = new Date();
   }
 

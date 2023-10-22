@@ -1,4 +1,5 @@
 const playwright = require('playwright');
+const crypto = require('crypto');
 const logger = require('./logger').child({ file: 'BrowserManager' });
 
 module.exports = class BrowserManager {
@@ -29,7 +30,7 @@ module.exports = class BrowserManager {
     return output;
   }
 
-  async stop() {
+  async stopAll() {
     for (const browser of Object.values(this.browsers)) {
       if (browser !== null) {
         await browser.close();
@@ -37,9 +38,25 @@ module.exports = class BrowserManager {
     }
   }
 
-  async createBrowser(name, options) {
+  async createCustomBrowser(name, args) {
+    const browser = await this.createBrowserInstance(name, args);
+    if (browser) {
+      const hash = crypto.createHash('md5').update(`${name}:${new Date().toLocaleString()}`).digest('hex');
+      const id = hash.substring(0, 6);
+      logger.info(`Started custom ${name} browser instance: ${id}`);
+      this.browsers[id] = {
+        browser,
+        type: name,
+        used: 0,
+        last_used: null,
+      };
+      return id;
+    }
+    return null;
+  }
+
+  async createBrowserInstance(name, options) {
     if (this.browserNames.includes(name)) {
-      logger.info(`Started ${name} browser instance`);
       return playwright[name].launch(options);
     }
     return null;
@@ -51,13 +68,13 @@ module.exports = class BrowserManager {
       last_used: new Date(),
       used: this.browsers[id].used += 1,
     };
-    this.browsers[id].last_used = new Date();
   }
 
   async getBrowser(id) {
     if (this.browserNames.includes(id)) {
       if (this.browsers[id].browser === null) {
-        this.browsers[id].browser = await this.createBrowser(id);
+        this.browsers[id].browser = await this.createBrowserInstance(id);
+        logger.info(`Started ${id} browser instance`);
       }
       this.updateBrowserUsed(id);
       return this.browsers[id].browser;

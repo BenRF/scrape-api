@@ -1,7 +1,13 @@
 const crypto = require('crypto');
 
 module.exports = class Endpoint {
-  constructor() {
+  constructor(path, getMethods = [], postMethods = []) {
+    this.path = path;
+    this.endpoints = {
+      GET: getMethods,
+      POST: postMethods,
+    };
+    this.totalPoints = getMethods.length + postMethods.length;
     this.requiredFields = [];
   }
 
