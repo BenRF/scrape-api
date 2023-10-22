@@ -9,15 +9,26 @@ module.exports = class Router {
     return this.router;
   }
 
-  createGet(path, endpoint) {
-    this.router.get(path, this.createRun(endpoint));
+  createEndpoints(endpoint) {
+    const singlePoint = endpoint.totalPoints === 1;
+    const calcPath = (name) => `/${endpoint.path}${(singlePoint) ? '' : `/${name}`}`;
+    for (const getFunct of endpoint.endpoints.GET) {
+      this.createGet(calcPath(getFunct), endpoint, getFunct);
+    }
+    for (const postFunct of endpoint.endpoints.POST) {
+      this.createPost(calcPath(postFunct), endpoint, postFunct);
+    }
   }
 
-  createPost(path, endpoint) {
-    this.router.post(path, this.createRun(endpoint));
+  createGet(path, endpoint, func) {
+    this.router.get(path, this.createRun(endpoint, func));
   }
 
-  createRun(endpoint) {
-    return endpoint.run.bind(endpoint);
+  createPost(path, endpoint, func) {
+    this.router.post(path, this.createRun(endpoint, func));
+  }
+
+  createRun(endpoint, func = 'run') {
+    return endpoint[func].bind(endpoint);
   }
 };
