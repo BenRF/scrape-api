@@ -59,7 +59,6 @@ module.exports = class BrowserManager {
     if (this.browserNames.includes(name)) {
       return playwright[name].launch({
         ...options,
-        headless: false,
       });
     }
     return null;
