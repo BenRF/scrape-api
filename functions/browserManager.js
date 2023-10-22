@@ -1,4 +1,5 @@
-const playwright = require('playwright');
+const playwright = require('playwright-extra');
+const stealth = require('puppeteer-extra-plugin-stealth')();
 const crypto = require('crypto');
 const logger = require('./logger').child({ file: 'BrowserManager' });
 
@@ -57,8 +58,10 @@ module.exports = class BrowserManager {
 
   async createBrowserInstance(name, options) {
     if (this.browserNames.includes(name)) {
+      playwright[name].use(stealth);
       return playwright[name].launch({
         ...options,
+        headless: false,
       });
     }
     return null;
