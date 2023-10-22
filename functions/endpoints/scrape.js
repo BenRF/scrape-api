@@ -5,7 +5,7 @@ const logger = require('../logger').child({ file: 'ScrapeEndpoint' });
 
 module.exports = class ScrapeEndpoint extends Endpoint {
   constructor(browserManager) {
-    super();
+    super('scrape', undefined, ['run']);
     this.requiredFields = ['url'];
     this.browserManager = browserManager;
   }
@@ -18,8 +18,9 @@ module.exports = class ScrapeEndpoint extends Endpoint {
     throw new Error('Browser not found');
   }
 
-  async newPage(id) {
-    return (await this.getBrowser(id)).newPage();
+  async newPage(id, contextOptions) {
+    const browser = await this.getBrowser(id);
+    return (await browser.newContext(contextOptions)).newPage();
   }
 
   async run(req, res) {
@@ -30,7 +31,7 @@ module.exports = class ScrapeEndpoint extends Endpoint {
       try {
         requestLog.info(`Scraping ${body.url}`);
         const browserId = body.browser || 'chromium';
-        page = await this.newPage(browserId);
+        page = await this.newPage(browserId, body.context || {});
         await this.gotoUrl(page, body);
         requestLog.debug('Page loaded');
 
@@ -74,7 +75,18 @@ module.exports = class ScrapeEndpoint extends Endpoint {
     }
   }
 
-  async gotoUrl(page, { url, navOptions }) {
+  async gotoUrl(page, { url, navOptions, waitFor }) {
     await page.goto(url, navOptions || { timeout: 30000, waitUntil: 'load' });
+    if (waitFor) {
+      try {
+        const waits = [];
+        for (const selector of waitFor) {
+          waits.push(page.waitForSelector(selector));
+        }
+        await Promise.all(waits);
+      } catch (e) {
+        throw new Error('Timed out waiting for selectors');
+      }
+    }
   }
 };
