@@ -1,3 +1,5 @@
-/functions/scrapeFunctions/index.js
 /node_modules/
 .idea
+/functions/endpoints/index.ts
+/functions/scrapeFunctions/index.js
+/functions/scrapeFunctions/index.ts

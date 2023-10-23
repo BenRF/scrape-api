@@ -1,20 +1,19 @@
-const pino = require('pino');
+import { pino } from 'pino';
 
-const createIf = (name, value) => [`{if ${name}}`, value, '{end}'].join('');
+function createIf(name: string, value: string): string {
+  return [`{if ${name}}`, value, '{end}'].join('');
+}
 
-module.exports = pino({
+const logger = pino({
   level: 'debug',
   transport: {
     targets: [
       {
         target: 'pino-pretty',
-        level: (process.env.DEBUG === '1') ? 'debug' : 'info',
+        level: ('1' === '1') ? 'debug' : 'info',
         options: {
           colorize: true,
           translateTime: 'HH:MM:ss',
-          // customPrettifiers: {
-          //   time: (timestamp) => `[${timestamp.split('.')[0]}]`,
-          // },
           ignore: 'request,hostname,file,pid,scrapeField,scrapeFunction',
           messageFormat: [
             createIf('file', '({file}) '),
@@ -28,3 +27,4 @@ module.exports = pino({
     ],
   },
 });
+export default logger;
