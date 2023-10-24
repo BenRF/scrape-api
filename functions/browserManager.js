@@ -58,10 +58,9 @@ module.exports = class BrowserManager {
 
   async createBrowserInstance(name, options) {
     if (this.browserNames.includes(name)) {
-      playwright[name].use(stealth);
+      // playwright[name].use(stealth);
       return playwright[name].launch({
         ...options,
-        headless: false,
       });
     }
     return null;
