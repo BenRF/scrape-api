@@ -2,7 +2,12 @@
 module.exports = class ScrapeFunction {
   constructor(name, args, logger) {
     this.args = args;
-    this.setName(name, logger);
+    if (name) {
+      this.setName(name, logger);
+    } else {
+      this.name = '';
+      this.logger = logger;
+    }
   }
 
   outputList(next) {

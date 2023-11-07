@@ -7,8 +7,8 @@ const ScrapeFunctions = require('./index');
 Allows for creating sub_objects in results, e.g. iterating through a list of elements and pulling multiple fields
 */
 module.exports = class Sub_steps extends ScrapeFunction {
-  constructor(args, logger) {
-    super('sub_steps', args, logger);
+  constructor(args, logger, isMainRun = false) {
+    super((isMainRun) ? undefined : 'sub_steps', args, logger);
   }
 
   async runSteps(callAs, result, next) {
@@ -16,7 +16,7 @@ module.exports = class Sub_steps extends ScrapeFunction {
     next.shift();
     for (const [field, instructions] of Object.entries(this.args)) {
       const fieldLog = this.logger.child({ scrapeField: field });
-      fieldLog.debug(`Starting on ${field}`);
+      fieldLog.debug('Starting');
       try {
         const steps = [];
         for (const { step, args } of instructions) {
