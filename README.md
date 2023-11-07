@@ -43,6 +43,8 @@ This request will return a JSON response with the following data:
 ````
 
 ## Scrape instructions:
+
+### Ordering:
 The API allows users to layer instructions, so they have better control over what is extracted and how it is manipulated. The order of these steps allowing for different operations to be performed. Following the example above, if we wanted to extract the Lego kit ID we could update the name field with an extra step to extract the value from the pages title:
 ````
 {
@@ -54,8 +56,36 @@ The API allows users to layer instructions, so they have better control over wha
     }
 }
 ````
+### Sub-steps:
+One of the available instructions allows for a set of instructions to be run for a single field, this can be useful if you're trying to pull multiple fields from multiple elements
+````
+{
+    "steps": {
+        "products": [
+            { "step": "get_elems", "args": ".product-list > div" },
+            { 
+                "step": "sub_steps", "args": {
+                    "title": [{ "step": "get_text", "args": ".name" }],
+                    "price": [{ "step": "get_price", "args": ".price" }]
+                }
+            }
+        ]
+    }
+}
+````
+Would return:
+````
+{
+   "products": [
+      { "title": "productA", "price": 5 },
+      { "title": "productB", "price": 3.52 },
+      { "title": "productC", "price": 25.2 },
+   ]
+}
+````
 
 ### Available steps:
+* [sub_steps](functions/scrapeFunctions/sub_steps.js): Collect multiple fields for a field
 * [elem_exists](functions/scrapeFunctions/elem_exists.js): Check if an element can be found on a page
 * [get_elem](functions/scrapeFunctions/get_elem.js): Finds the first occurrence of a matching element
 * [get_elems](functions/scrapeFunctions/get_elems.js): Finds all occurrences of matching elements

@@ -35,29 +35,9 @@ module.exports = class ScrapeEndpoint extends Endpoint {
         await this.gotoUrl(page, body);
         requestLog.debug('Page loaded');
 
-        const result = {};
-        for (const [field, instructions] of Object.entries(body.steps)) {
-          const fieldLog = requestLog.child({ scrapeField: field });
-          fieldLog.debug('Starting');
-          try {
-            const steps = [];
-            for (const { step, args } of instructions) {
-              if (ScrapeFunctions[step]) {
-                steps.push(new ScrapeFunctions[step](args, fieldLog));
-              } else {
-                const message = `${step} is not a valid function`;
-                fieldLog.error(message);
-                throw new Error(message);
-              }
-            }
-            result[field] = await steps[0].runFirst(page, steps);
-            fieldLog.debug('Done');
-          } catch (e) {
-            fieldLog.error(e.message);
-            result[field] = { error: e.message };
-          }
-        }
-        this.jsonRespond(res, result);
+        // eslint-disable-next-line new-cap
+        const execution = new ScrapeFunctions.sub_steps(body.steps, requestLog, true);
+        this.jsonRespond(res, await execution.runFirst(page, []));
       } catch (e) {
         requestLog.error(e.message);
         this.errorRespond(res, 500, { name: e.name, message: e.message });

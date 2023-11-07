@@ -18,9 +18,12 @@ module.exports = class Get_text extends ScrapeFunction {
   }
 
   async runFirst(page, next) {
-    const step = new Get_elem(this.args, this.logger);
-    step.setName(this.name, this.logger);
-    return step.runFirst(page, [this, ...next]);
+    if (this.args) {
+      const step = new Get_elem(this.args, this.logger);
+      step.setName(this.name, this.logger);
+      return step.runFirst(page, [this, ...next]);
+    }
+    return this.runFromElement(page, next);
   }
 
   async runFromElement(elem, next) {
