@@ -36,7 +36,7 @@ module.exports = class ScrapeEndpoint extends Endpoint {
         requestLog.debug('Page loaded');
 
         // eslint-disable-next-line new-cap
-        const execution = new ScrapeFunctions.sub_steps(body.steps, requestLog);
+        const execution = new ScrapeFunctions.sub_steps(body.steps, requestLog, true);
         this.jsonRespond(res, await execution.runFirst(page, []));
       } catch (e) {
         requestLog.error(e.message);

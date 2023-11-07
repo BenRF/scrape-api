@@ -24,7 +24,10 @@ module.exports = class get_price extends ScrapeFunction {
   }
 
   async runFirst(page, next) {
-    return this.get_text.runFirst(page, [this.get_text, this.get_regex, ...next]);
+    if (this.args) {
+      return this.get_text.runFirst(page, [this.get_text, this.get_regex, ...next]);
+    }
+    return this.runFromElement(page, next);
   }
 
   async runFromElement(elem, next) {
