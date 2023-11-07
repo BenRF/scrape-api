@@ -36,8 +36,8 @@ module.exports = class get_elems extends ScrapeFunction {
     next.shift();
     if (next.length > 0) {
       const output = [];
-      for (const elem of results) {
-        this.log(`Using: ${(elem !== null) ? `<${await elem.evaluate((e) => e.tagName.toLowerCase())}> element` : null}`);
+      for (const [i, elem] of results.entries()) {
+        this.log(`Running on element ${i}`);
         output.push(await next[0].runFromElement(elem, [...next]));
       }
       return output;
