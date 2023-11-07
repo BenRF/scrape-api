@@ -11,7 +11,7 @@ This function will run a regex match to look for any prices inside an elements t
 module.exports = class get_price extends ScrapeFunction {
   constructor(args, logger) {
     super('get_price', args, logger);
-    this.get_regex = new Get_regex('/\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2})/g', logger);
+    this.get_regex = new Get_regex('/\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2})?/g', logger);
     this.get_regex.setName('get_price', logger);
     this.get_text = new Get_text(this.args, this.logger);
     this.get_text.setName('get_price', logger);
