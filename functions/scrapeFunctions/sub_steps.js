@@ -1,4 +1,5 @@
 const ScrapeFunction = require('./function');
+// eslint-disable-next-line import/extensions
 const ScrapeFunctions = require('./index');
 
 /* sub_steps:
