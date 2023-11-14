@@ -12,9 +12,6 @@ module.exports = pino({
         options: {
           colorize: true,
           translateTime: 'HH:MM:ss',
-          // customPrettifiers: {
-          //   time: (timestamp) => `[${timestamp.split('.')[0]}]`,
-          // },
           ignore: 'request,hostname,file,pid,scrapeField,scrapeFunction',
           messageFormat: [
             createIf('file', '({file}) '),
