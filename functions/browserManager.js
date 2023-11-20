@@ -3,6 +3,9 @@ const stealth = require('puppeteer-extra-plugin-stealth')();
 const crypto = require('crypto');
 const logger = require('./logger').child({ file: 'BrowserManager' });
 
+const TIDY_SCHEDULE = 5; // minutes
+const MAX_BROWSER_AGE = 5; // minutes since browser was last used before closing it
+
 module.exports = class BrowserManager {
   constructor() {
     this.browserNames = ['chromium', 'firefox', 'webkit'];
@@ -15,6 +18,21 @@ module.exports = class BrowserManager {
         last_used: null,
       };
     }
+    const bM = this;
+    setInterval(async () => {
+      logger.info('Tidying browsers');
+      const now = Date.parse(new Date());
+      for (const [id, browser] of Object.entries(bM.browsers)) {
+        if (browser.last_used && browser.browser !== null) {
+          const age = now - Date.parse(browser.last_used);
+          if (age > (MAX_BROWSER_AGE / 60) / 1000) {
+            logger.info(`${id} has not been used for a while, closing it`);
+            await browser.browser.close();
+            browser.browser = null;
+          }
+        }
+      }
+    }, TIDY_SCHEDULE * 60000);
   }
 
   list() {
@@ -36,14 +54,6 @@ module.exports = class BrowserManager {
     for (const browser of Object.values(this.browsers)) {
       if (browser !== null) {
         await browser.close();
-      }
-    }
-  }
-
-  async tidyBrowsers() {
-    for (const browser of this.browsers) {
-      if (browser.last_used) {
-
       }
     }
   }
