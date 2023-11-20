@@ -3,6 +3,9 @@ const stealth = require('puppeteer-extra-plugin-stealth')();
 const crypto = require('crypto');
 const logger = require('./logger').child({ file: 'BrowserManager' });
 
+const TIDY_SCHEDULE = 5; // minutes
+const MAX_BROWSER_AGE = 5; // minutes since browser was last used before closing it
+
 module.exports = class BrowserManager {
   constructor() {
     this.browserNames = ['chromium', 'firefox', 'webkit'];
@@ -15,6 +18,21 @@ module.exports = class BrowserManager {
         last_used: null,
       };
     }
+    const bM = this;
+    setInterval(async () => {
+      logger.info('Tidying browsers');
+      const now = Date.parse(new Date());
+      for (const [id, browser] of Object.entries(bM.browsers)) {
+        if (browser.last_used && browser.browser !== null) {
+          const age = now - Date.parse(browser.last_used);
+          if (age > (MAX_BROWSER_AGE / 60) / 1000) {
+            logger.info(`${id} has not been used for a while, closing it`);
+            await browser.browser.close();
+            browser.browser = null;
+          }
+        }
+      }
+    }, TIDY_SCHEDULE * 60000);
   }
 
   list() {
@@ -26,6 +44,7 @@ module.exports = class BrowserManager {
         type: obj.type,
         used: obj.used,
         last_used: obj.last_used,
+        args: obj.args,
       });
     }
     return output;
@@ -50,6 +69,7 @@ module.exports = class BrowserManager {
         type: name,
         used: 0,
         last_used: null,
+        args,
       };
       return id;
     }
@@ -75,17 +95,17 @@ module.exports = class BrowserManager {
   }
 
   async getBrowser(id) {
-    if (this.browserNames.includes(id)) {
-      if (this.browsers[id].browser === null) {
-        this.browsers[id].browser = await this.createBrowserInstance(id);
-        logger.info(`Started ${id} browser instance`);
-      }
-      this.updateBrowserUsed(id);
-      return this.browsers[id].browser;
-    }
+    let browser = null;
     if (this.browsers[id]) {
       this.updateBrowserUsed(id);
-      return this.browsers[id].browser;
+      browser = this.browsers[id];
+    }
+    if (browser) {
+      if (browser.browser === null) {
+        logger.info(`Started ${id} browser instance`);
+        browser.browser = await this.createBrowserInstance(browser.type, browser.args);
+      }
+      return browser.browser;
     }
     return null;
   }

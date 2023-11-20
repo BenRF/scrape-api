@@ -1,0 +1,101 @@
+###
+# @name product details
+POST {{domain}}/scrape
+Content-Type: application/json
+
+{
+  "url": "https://www.alternate.de/LEGO/76419-Harry-Potter-Schloss-Hogwarts-mit-Schlossgel%C3%A4nde-Konstruktionsspielzeug/html/product/1906200",
+  "navOptions": {
+    "timeout": 30000
+  },
+  "browser": "firefox",
+  "steps": {
+    "name": [{ "step": "page_title" }],
+    "in_stock": [{ "step": "elem_exists", "args": "a.add-to-cart" }],
+    "price": [{ "step": "get_price", "args": "div#product-top span.price" }],
+    "price_was": [{ "step": "get_price", "args": "div#product-top span.line-through"}],
+    "image": [
+      { "step": "get_elem", "args": "div#product-gallery-big-slider > div:nth-child(1) img" },
+      { "step": "get_attribute","args": "src" }
+    ],
+    "brandLink": [{ "step": "get_link", "args": "a.product-manufacturer-logo" }],
+    "description": [{ "step": "get_text", "args": "div#product-description-tab div.card-body" }]
+  }
+}
+
+###
+# @name prices
+POST {{domain}}/scrape
+Content-Type: application/json
+
+{
+  "url": "https://www.alternate.de/listing.xhtml?articleId=1871724,1906291,1906297,1906290,1907487,1906294,1906289,1871726,1830044",
+  "navOptions": {
+    "timeout": 30000
+  },
+  "steps": {
+    "prices": [
+      { "step": "get_elems", "args": "//span[contains(@class, \"price\")]" },
+      { "step": "get_price" }
+    ]
+  }
+}
+
+###
+# @name products
+POST {{domain}}/scrape
+Content-Type: application/json
+
+{
+  "url": "https://www.alternate.de/listing.xhtml?articleId=1871724,1906291,1906297,1906290,1907487,1906294,1906289,1871726,1830044",
+  "navOptions": {
+    "timeout": 30000
+  },
+  "steps": {
+    "products": [
+      { "step": "get_elems", "args": "div.listing > a" },
+      {
+        "step": "sub_steps",
+        "args": {
+          "title": [{ "step": "get_text", "args": "div.product-name" }],
+          "price": [{ "step": "get_price", "args": "span.price" }],
+          "link": [{ "step": "get_link" }]
+        }
+      }
+    ]
+  }
+}
+
+###
+# @name Xpath text test
+POST {{domain}}/scrape
+Content-Type: application/json
+
+{
+  "url": "https://www.alternate.de/listing.xhtml?articleId=1871724,1906291,1906297,1906290,1907487,1906294,1906289,1871726,1830044",
+  "navOptions": {
+    "timeout": 30000
+  },
+  "steps": {
+    "titles": [{ "step": "xpath", "args": "//div[contains(@class, \"product-name\")]/text()" }]
+  }
+}
+
+###
+# @name regex titles
+POST {{domain}}/scrape
+Content-Type: application/json
+
+{
+  "url": "https://www.alternate.de/listing.xhtml?q=lego",
+  "navOptions": {
+    "timeout": 30000
+  },
+  "steps": {
+    "titles": [
+      { "step": "get_elems", "args": "div.product-name" },
+      { "step": "get_text" },
+      { "step": "get_regex", "args": "/LEGO\\d{5}/gm" }
+    ]
+  }
+}

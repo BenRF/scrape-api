@@ -1,0 +1,19 @@
+###
+# @name List
+GET {{domain}}/browser/list
+
+###
+# @name Create
+POST {{domain}}/browser/create
+Content-Type: application/json
+
+{
+  "name": "chromium",
+  "args": {
+    "proxy": {
+      "server": "http://myproxy.com:3128",
+      "username": "usr",
+      "password": "pwd"
+    }
+  }
+}
