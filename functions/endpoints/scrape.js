@@ -1,3 +1,4 @@
+const { performance } = require('perf_hooks');
 const Endpoint = require('./endpoint');
 // eslint-disable-next-line import/extensions
 const ScrapeFunctions = require('../scrapeFunctions');
@@ -25,19 +26,50 @@ module.exports = class ScrapeEndpoint extends Endpoint {
 
   async run(req, res) {
     const { body } = req;
-    const requestLog = logger.child({ request: this.createRequestId(req) });
+    const stats = {};
+    const requestId = this.createRequestId(req);
+    const requestStart = performance.now();
+    const requestLog = logger.child({ request: requestId });
     if (this.validBody(body)) {
       let page;
       try {
-        requestLog.info(`Scraping ${body.url}`);
-        const browserId = body.browser || 'chromium';
-        page = await this.newPage(browserId, body.context || {});
-        await this.gotoUrl(page, body);
-        requestLog.debug('Page loaded');
+        const { url, browser, navOptions, waitFor, context, steps } = body;
+        requestLog.info(`Scraping ${url}`);
+        const browserId = browser || 'chromium';
+        requestLog.debug(`Using ${browser || 'chromium'} browser`);
+        if (context) requestLog.debug(`Custom context: ${context}`);
+        page = await (await (await this.getBrowser(browserId)).newContext(context || {})).newPage();
+        const options = navOptions || { timeout: 30000, waitUntil: 'load' };
+        requestLog.debug(`Navigation options: ${JSON.stringify(options)}`);
+        const navigationStart = performance.now();
+        await page.goto(url, options);
+        stats.navigation = this.calcTime(navigationStart);
+        requestLog.debug(`Navigated ${stats.navigation}ms`);
+        if (waitFor) {
+          try {
+            const waits = [];
+            for (const selector of waitFor) {
+              waits.push(page.waitForSelector(selector));
+              requestLog.debug(`Waiting for: ${selector}`);
+            }
+            await Promise.all(waits);
+          } catch (e) {
+            throw new Error('Timed out waiting for selectors');
+          }
+          stats.pageLoad = this.calcTime(navigationStart);
+          requestLog.debug(`Page loaded: ${stats.pageLoad}ms`);
+        }
 
         // eslint-disable-next-line new-cap
-        const execution = new ScrapeFunctions.sub_steps(body.steps, requestLog, true);
-        this.jsonRespond(res, await execution.runFirst(page, []));
+        const execution = new ScrapeFunctions.sub_steps(steps, requestLog, true);
+        this.jsonRespond(res, {
+          id: requestId,
+          stats: {
+            request: this.calcTime(requestStart),
+            ...stats,
+          },
+          results: await execution.runFirst(page, []),
+        });
       } catch (e) {
         requestLog.error(e.message);
         this.errorRespond(res, 500, { name: e.name, message: e.message });
@@ -55,18 +87,7 @@ module.exports = class ScrapeEndpoint extends Endpoint {
     }
   }
 
-  async gotoUrl(page, { url, navOptions, waitFor }) {
-    await page.goto(url, navOptions || { timeout: 30000, waitUntil: 'load' });
-    if (waitFor) {
-      try {
-        const waits = [];
-        for (const selector of waitFor) {
-          waits.push(page.waitForSelector(selector));
-        }
-        await Promise.all(waits);
-      } catch (e) {
-        throw new Error('Timed out waiting for selectors');
-      }
-    }
+  calcTime(start) {
+    return Math.floor(performance.now() - start);
   }
 };

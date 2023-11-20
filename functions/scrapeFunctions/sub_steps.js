@@ -14,28 +14,37 @@ module.exports = class Sub_steps extends ScrapeFunction {
   async runSteps(callAs, result, next) {
     const output = {};
     next.shift();
+    const promises = [];
     for (const [field, instructions] of Object.entries(this.args)) {
-      const fieldLog = this.logger.child({ scrapeField: field });
-      fieldLog.debug('Starting');
-      try {
-        const steps = [];
-        for (const { step, args } of instructions) {
-          if (ScrapeFunctions[step]) {
-            steps.push(new ScrapeFunctions[step](args, fieldLog));
-          } else {
-            const message = `${step} is not a valid function`;
-            fieldLog.error(message);
-            throw new Error(message);
-          }
-        }
-        output[field] = await steps[0][callAs](result, [...steps, ...next]);
-        fieldLog.debug('Done');
-      } catch (e) {
-        fieldLog.error(e.message);
-        output[field] = { error: e.message };
-      }
+      // eslint-disable-next-line no-return-assign
+      promises.push(this.runStep(field, instructions, callAs, result, next).then((o) => {
+        output[field] = o;
+        this.logger.debug(`${field} done`);
+      }).catch((e) => { output[field] = { error: e.message }; }));
     }
+    await Promise.all(promises);
     return output;
+  }
+
+  async runStep(field, instructions, callAs, result, next) {
+    const fieldLog = this.logger.child({ scrapeField: field });
+    fieldLog.debug('Starting');
+    try {
+      const steps = [];
+      for (const { step, args } of instructions) {
+        if (ScrapeFunctions[step]) {
+          steps.push(new ScrapeFunctions[step](args, fieldLog));
+        } else {
+          const message = `${step} is not a valid function`;
+          fieldLog.error(message);
+          throw new Error(message);
+        }
+      }
+      return steps[0][callAs](result, [...steps, ...next]);
+    } catch (e) {
+      fieldLog.error(e.message);
+      return { error: e.message };
+    }
   }
 
   async runFirst(page, next) {

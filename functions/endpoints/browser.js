@@ -18,7 +18,7 @@ module.exports = class BrowserEndpoint extends Endpoint {
       this.jsonRespond(res, {
         id,
         type: body.name,
-        message: (!body.args) ? 'You have made a default browser, ' : undefined,
+        message: (!body.args) ? 'You have made a default browser' : undefined,
       });
     } catch (e) {
       this.errorRespond(res, e.message);

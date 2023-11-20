@@ -25,7 +25,12 @@ module.exports = class Get_elem extends ScrapeFunction {
     if (elem !== null) {
       return this.runNext(elem, next);
     }
-    throw new Error(`${this.selector} not found`);
+    const msg = `${this.selector} not found`;
+    this.logger.warn(msg);
+    return {
+      warning: msg,
+    };
+    // throw new Error(`${this.selector} not found`);
   }
 
   async runFromElement(elem, next) {
