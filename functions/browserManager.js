@@ -26,6 +26,7 @@ module.exports = class BrowserManager {
         type: obj.type,
         used: obj.used,
         last_used: obj.last_used,
+        args: obj.args,
       });
     }
     return output;
@@ -35,6 +36,14 @@ module.exports = class BrowserManager {
     for (const browser of Object.values(this.browsers)) {
       if (browser !== null) {
         await browser.close();
+      }
+    }
+  }
+
+  async tidyBrowsers() {
+    for (const browser of this.browsers) {
+      if (browser.last_used) {
+
       }
     }
   }
@@ -50,6 +59,7 @@ module.exports = class BrowserManager {
         type: name,
         used: 0,
         last_used: null,
+        args,
       };
       return id;
     }
@@ -75,17 +85,17 @@ module.exports = class BrowserManager {
   }
 
   async getBrowser(id) {
-    if (this.browserNames.includes(id)) {
-      if (this.browsers[id].browser === null) {
-        this.browsers[id].browser = await this.createBrowserInstance(id);
-        logger.info(`Started ${id} browser instance`);
-      }
-      this.updateBrowserUsed(id);
-      return this.browsers[id].browser;
-    }
+    let browser = null;
     if (this.browsers[id]) {
       this.updateBrowserUsed(id);
-      return this.browsers[id].browser;
+      browser = this.browsers[id];
+    }
+    if (browser) {
+      if (browser.browser === null) {
+        logger.info(`Started ${id} browser instance`);
+        browser.browser = await this.createBrowserInstance(browser.type, browser.args);
+      }
+      return browser.browser;
     }
     return null;
   }

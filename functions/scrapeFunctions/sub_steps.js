@@ -20,7 +20,7 @@ module.exports = class Sub_steps extends ScrapeFunction {
       promises.push(this.runStep(field, instructions, callAs, result, next).then((o) => {
         output[field] = o;
         this.logger.debug(`${field} done`);
-      }));
+      }).catch((e) => { output[field] = { error: e.message }; }));
     }
     await Promise.all(promises);
     return output;

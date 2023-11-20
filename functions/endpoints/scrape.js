@@ -56,9 +56,9 @@ module.exports = class ScrapeEndpoint extends Endpoint {
           } catch (e) {
             throw new Error('Timed out waiting for selectors');
           }
+          stats.pageLoad = this.calcTime(navigationStart);
+          requestLog.debug(`Page loaded: ${stats.pageLoad}ms`);
         }
-        stats.pageLoad = this.calcTime(navigationStart);
-        requestLog.debug(`Page loaded: ${stats.pageLoad}ms`);
 
         // eslint-disable-next-line new-cap
         const execution = new ScrapeFunctions.sub_steps(steps, requestLog, true);
