@@ -8,6 +8,7 @@
     "build-index": "node functions/createIndex.js",
     "run-server": "npm run build-index && node functions/api.js",
     "run-server-debug": "npm run build-index && node functions/api.js -debug",
+    "run-server-inspect": "npm run build-index && node --inspect functions/api.js",
     "build-image": "docker build -t benrf/scrape-api .",
     "run-image": "docker run -p 3000:3000 benrf/scrape-api"
   },
@@ -19,6 +20,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-jest": "^27.4.2",
     "express": "^4.18.2",
+    "express-status-monitor": "^1.3.4",
     "git-root-dir": "^1.0.2",
     "npm": "^10.2.3",
     "pino": "^8.16.0",
