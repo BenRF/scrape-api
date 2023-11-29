@@ -19,6 +19,8 @@ for (const endpoint of [new StatusEndpoint(), new ScrapeEndpoint(browserManager)
 }
 
 const app = express();
+app.use(require('express-status-monitor')());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
