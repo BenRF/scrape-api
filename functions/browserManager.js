@@ -25,7 +25,7 @@ module.exports = class BrowserManager {
       for (const [id, browser] of Object.entries(bM.browsers)) {
         if (browser.last_used && browser.browser !== null) {
           const age = now - Date.parse(browser.last_used);
-          logger.info(`${id} is ${age} old`);
+          logger.info(`${id} last used ${age}ms ago`);
           if (age > (MAX_BROWSER_AGE * 60) * 1000) {
             logger.info(browser.last_used.toLocaleTimeString());
             logger.info(`${id} has not been used for a while, closing it`);
