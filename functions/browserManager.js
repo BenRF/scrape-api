@@ -3,7 +3,7 @@ const stealth = require('puppeteer-extra-plugin-stealth')();
 const crypto = require('crypto');
 const logger = require('./logger').child({ file: 'BrowserManager' });
 
-const TIDY_SCHEDULE = 5; // minutes
+const TIDY_SCHEDULE = 2; // minutes
 const MAX_BROWSER_AGE = 5; // minutes since browser was last used before closing it
 
 module.exports = class BrowserManager {
@@ -25,7 +25,9 @@ module.exports = class BrowserManager {
       for (const [id, browser] of Object.entries(bM.browsers)) {
         if (browser.last_used && browser.browser !== null) {
           const age = now - Date.parse(browser.last_used);
-          if (age > (MAX_BROWSER_AGE / 60) / 1000) {
+          logger.info(`${id} last used ${age}ms ago`);
+          if (age > (MAX_BROWSER_AGE * 60) * 1000) {
+            logger.info(browser.last_used.toLocaleTimeString());
             logger.info(`${id} has not been used for a while, closing it`);
             await browser.browser.close();
             browser.browser = null;
