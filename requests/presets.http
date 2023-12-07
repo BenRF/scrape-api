@@ -1,0 +1,16 @@
+###
+# @name List presets
+GET {{domain}}/preset/list
+
+###
+# @name Create
+POST {{domain}}/preset/create
+Content-Type: application/json
+
+{
+  "name": "testPreset",
+  "preset": {
+    "browser": "firefox"
+  },
+  "overwrite": true
+}

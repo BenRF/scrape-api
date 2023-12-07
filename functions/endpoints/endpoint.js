@@ -16,6 +16,20 @@ module.exports = class Endpoint {
     return hash.substring(0, 8);
   }
 
+  objHasFields(obj, fields) {
+    for (const field of fields) {
+      if (obj[field] === undefined) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  validateReq(req, compulsoryFields, types) {
+    const { body } = req;
+    return this.objHasFields(body, Object.keys(compulsoryFields));
+  }
+
   // eslint-disable-next-line no-unused-vars
   run(req, res) {
     throw new Error('Endpoint.run() not implemented');
@@ -35,7 +49,7 @@ module.exports = class Endpoint {
   }
 
   errorRespond(res, code, msg) {
-    res.statusCode = code;
+    res.statusCode = code.toString();
     res.json(msg);
   }
 };

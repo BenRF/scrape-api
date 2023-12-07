@@ -25,7 +25,13 @@ module.exports = class Router {
   }
 
   createPost(path, endpoint, func) {
-    this.router.post(path, this.createRun(endpoint, func));
+    const validatorFunc = `validate${func}`;
+    if (endpoint[validatorFunc]) {
+      console.log(`Setup to call ${validatorFunc}`);
+      this.router.post(path, this.createRun(endpoint, validatorFunc), this.createRun(endpoint, func));
+    } else {
+      this.router.post(path, this.createRun(endpoint, func));
+    }
   }
 
   createRun(endpoint, func = 'run') {
