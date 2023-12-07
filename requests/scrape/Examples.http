@@ -99,3 +99,20 @@ Content-Type: application/json
     ]
   }
 }
+
+###
+# @name Get url
+POST {{domain}}/scrape
+Content-Type: application/json
+
+{
+  "url": "https://www.alternate.de/listing.xhtml?q=lego",
+  "navOptions": {
+    "timeout": 30000
+  },
+  "steps": {
+    "url": [
+      { "step": "page_url" }
+    ]
+  }
+}
