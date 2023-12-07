@@ -5,10 +5,11 @@ const ScrapeFunctions = require('../scrapeFunctions');
 const logger = require('../logger').child({ file: 'ScrapeEndpoint' });
 
 module.exports = class ScrapeEndpoint extends Endpoint {
-  constructor(browserManager) {
+  constructor(browserManager, presetManager) {
     super('scrape', undefined, ['run']);
     this.requiredFields = ['url'];
     this.browserManager = browserManager;
+    this.presetManager = presetManager;
   }
 
   async getBrowser(id) {
@@ -33,7 +34,7 @@ module.exports = class ScrapeEndpoint extends Endpoint {
     if (this.validBody(body)) {
       let page;
       try {
-        const { url, browser, navOptions, waitFor, context, steps } = body;
+        const { preset, url, browser, navOptions, waitFor, context, steps } = body;
         requestLog.info(`Scraping ${url}`);
         const browserId = browser || 'chromium';
         requestLog.debug(`Using ${browser || 'chromium'} browser`);

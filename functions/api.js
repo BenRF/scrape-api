@@ -5,16 +5,23 @@ process.env.DEBUG = process.argv.includes('-debug') ? '1' : '0';
 
 const logger = require('./logger').child({ file: 'Api' });
 
-const StatusEndpoint = require('./endpoints/status');
-const ScrapeEndpoint = require('./endpoints/scrape');
 const BrowserManager = require('./browserManager');
-const BrowserEndpoint = require('./endpoints/browser');
+const PresetManager = require('./presetManager');
+const {
+  StatusEndpoint, ScrapeEndpoint,
+  BrowserEndpoint, PresetEndpoint,
+} = require('./endpoints');
 const Router = require('./router');
 
 const router = new Router();
 const browserManager = new BrowserManager();
+const presetManager = new PresetManager();
 
-for (const endpoint of [new StatusEndpoint(), new ScrapeEndpoint(browserManager), new BrowserEndpoint(browserManager)]) {
+const endpoints = [
+  new StatusEndpoint(), new ScrapeEndpoint(browserManager, presetManager),
+  new BrowserEndpoint(browserManager), new PresetEndpoint(presetManager),
+];
+for (const endpoint of endpoints) {
   router.createEndpoints(endpoint);
 }
 
